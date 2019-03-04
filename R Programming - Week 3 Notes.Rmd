@@ -1,0 +1,156 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+#R Programming Week 3 Notes
+
+#Loop Functions - Apply
+
+x <- matrix(rnorm(200), 20, 10)
+apply(x,2,mean)
+apply(x,1,sum)
+
+# rowSums = apply(x,1,sum)
+# rowMeans = apply(x,1,mean)
+# colsums = apply(x,2,sum)
+# colMeans = apply(x,2,mean)
+#optimize matrix calcs
+
+apply(x,1, quantile, probs = c(.25, .75))
+## calculate the quantiles of the rows of a matrix
+
+a <- array(rnorm(2 * 2 * 10), c(2,2,10))
+apply(a, c(1,2), mean)
+#takes array and averages over the third dimension
+
+rowMeans(a, dims = 2)
+
+# Loop Functions - mapply
+
+#mapply is a multivar apply which applies a function in parallel over a set of arguemtns
+
+str(mapply)
+
+list(rep(1,4), rep(2,3), rep(3,2), rep(4,1))
+mapply(rep, 1:4, 4:1)
+# mapply can be used to apply a function to multiple sets of arguments
+
+noise <- function(n, mean, sd) {
+  rnorm(n,mean,sd)
+}
+
+noise(5,1,2)
+
+mapply(noise, 1:5, 1:5, 2)
+#random variables with mean 1,2,3 and so on
+#instantly vectorize a function
+
+#Loop FUnctions - t apply
+
+str(tapply)
+#used to apply a function over subsets of a vector
+
+x <- c(rnorm(10), runif(10), rnorm(10,1))
+f <- gl(3,10)
+f
+tapply(x,f,mean)
+# allows you to take the mean of each group of numbers in x
+
+tapply(x,f,mean, simplify = FALSE)
+# get back a list with three elements and the element is the mean of the subgroup
+
+tapply(x,f,range)
+#calculates range of observations
+
+#Loop Functions - Split
+
+str(split)
+#used to take a vector or other objects and splits it into groups determined by a factor or list of factors
+#does not apply summary statistics
+
+split(x,f)
+
+lapply(split(x,f), mean)
+# t apply does the same thing
+
+library(datasets)
+head(airquality)
+
+s <- split(airquality, airquality$Month)
+lapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
+
+sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
+sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE))
+
+x <- rnorm(10)
+f1 <- gl(2,5)
+f2 <- gl(5,2)
+f1
+f2
+interaction(f1,f2)
+
+str(split(x, list(f1,f2)))
+#interactions can create empty levels
+
+str(split(x, list(f1,f2), drop = TRUE))
+#drop empty levels
+
+#Debugging Tools - Diagnosing the problem
+
+#How do you know that something is wrong: message, warning, error, condition
+
+#message: general notification, won't stop function frome executing
+#warning: indication that something is wrong, execution of function continues
+#error: indication that a fatal problem has occured, execution stops
+#conditions: generic concept to indicate that something unexpected has occurred
+
+
+#Warning
+#log(-1)
+
+#  printmessage <- function(x) {
+#  if(x<0)
+#    print("x is greater than zero")
+#  else
+#    print("x is less than or equal to zero")
+#  invisible(x)
+#  }
+
+# printmessage(1)
+#  printmessage(NA) #Error message
+
+# printmessage2 <- function(x) {
+#  if(is.na(x))
+#    print("x is missing a value!")
+#  else if (x>0)
+#    print("x is greater than zero")
+#  else
+#    print("x is less than or equal to zero")
+#  invisible(x)
+#   }
+
+# x <- log(-1)
+# printmessage2(x)
+
+#Debugging Tools in R
+
+#traceback: prints out the fucntion call stack after an error occurs, does nothing if there is not an error
+#debug: flags a function for "debug" mode which allows you to step through execution of a function one line at a time
+#browser: suspends the execution of a function wherever it is called and puts the function in debug mode
+#trace: allows user to insert debug code into a function at specific places
+#recover: allows you to modify the error behavior so that you can browse the function call stack
+
+#Debugging Tools - Using the Tools
+
+#mean(x)
+#traceback()
+
+#lm( y ~ x)
+#traceback()
+
+#debug(lm)
+#lm(y ~ x)
+
+#options(error = recover)
+#read.csv('nosuchfile')
